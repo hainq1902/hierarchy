@@ -112,4 +112,20 @@ public class FilterTest {
 
         Assert.assertEquals(filteredExpected.formatString(), filteredActual.formatString());
     }
+
+    @Test
+    public void testFilterWithFailRoot() {
+        Hierarchy unfiltered = new ArrayBasedHierarchy(
+                //         x  x     x  x     x  x     x   x
+                new int[] {3, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+                new int[] {0, 1, 2, 3, 1, 0, 1, 0, 1, 1, 2}
+        );
+        Hierarchy filteredActual = Filter.filter(unfiltered, nodeId -> nodeId % 3 != 0);
+        Hierarchy filteredExpected = new ArrayBasedHierarchy(
+                new int[] {8, 10, 11},
+                new int[] {0, 1, 2}
+        );
+
+        Assert.assertEquals(filteredExpected.formatString(), filteredActual.formatString());
+    }
 }

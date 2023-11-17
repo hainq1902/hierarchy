@@ -15,7 +15,6 @@ public class Filter {
      * A node is present in the filtered hierarchy iff its node ID passes the predicate and all of its ancestors pass it as well.
      * */
     public static Hierarchy filter(Hierarchy hierarchy, IntPredicate nodeIdPredicate) {
-        // todo implement
         final List<Integer> nodeIds = new LinkedList<>();
         final List<Integer> depths = new LinkedList<>();
 
@@ -55,7 +54,10 @@ public class Filter {
         return currentIndex;
     }
 
-    private static void addToResult(Hierarchy hierarchy, List<Integer> nodeIds, List<Integer> depths, int currentIndex) {
+    private static void addToResult(Hierarchy hierarchy,
+                                    List<Integer> nodeIds,
+                                    List<Integer> depths,
+                                    int currentIndex) {
         nodeIds.add(hierarchy.nodeId(currentIndex));
         depths.add(hierarchy.depth(currentIndex));
     }
