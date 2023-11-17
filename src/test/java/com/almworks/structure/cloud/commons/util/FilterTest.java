@@ -96,4 +96,20 @@ public class FilterTest {
 
         Assert.assertEquals(filteredExpected.formatString(), filteredActual.formatString());
     }
+
+    @Test
+    public void testFilterManySiblings() {
+        Hierarchy unfiltered = new ArrayBasedHierarchy(
+                //         0  1  2  3  4  5  6  7  8  9   10
+                new int[] {1, 2, 31, 4, 5, 61, 7, 8, 9, 10, 11},
+                new int[] {0, 1, 2, 3, 3, 3, 3, 3, 4, 4, 4}
+        );
+        Hierarchy filteredActual = Filter.filter(unfiltered, nodeId -> nodeId % 3 != 0);
+        Hierarchy filteredExpected = new ArrayBasedHierarchy(
+                new int[] {1, 2, 31, 4, 5, 61, 7, 8, 10, 11},
+                new int[] {0, 1, 2, 3, 3, 3, 3, 3, 4, 4}
+        );
+
+        Assert.assertEquals(filteredExpected.formatString(), filteredActual.formatString());
+    }
 }

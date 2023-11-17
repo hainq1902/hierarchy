@@ -1,7 +1,6 @@
 package com.almworks.structure.cloud.commons.util;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,11 +10,11 @@ import java.util.OptionalInt;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
 
-class Filter {
+public class Filter {
     /**
      * A node is present in the filtered hierarchy iff its node ID passes the predicate and all of its ancestors pass it as well.
      * */
-    static Hierarchy filter(Hierarchy hierarchy, IntPredicate nodeIdPredicate) {
+    public static Hierarchy filter(Hierarchy hierarchy, IntPredicate nodeIdPredicate) {
         // todo implement
         final List<Integer> nodeIds = new LinkedList<>();
         final List<Integer> depths = new LinkedList<>();
@@ -26,22 +25,16 @@ class Filter {
         while (currentIndex < hierarchy.size()) {
             findNextSibling(hierarchy,
                             currentIndex,
-                            Optional.ofNullable(siblingStack.peek())
-                                    .orElse(hierarchy.size()))
+                            Optional.ofNullable(siblingStack.peek()).orElse(hierarchy.size()))
                 .ifPresent(siblingStack::push);
 
             if (nodeIdPredicate.test(hierarchy.nodeId(currentIndex))) {
-                nodeIds.add(hierarchy.nodeId(currentIndex));
-                depths.add(hierarchy.depth(currentIndex));
+                addToResult(hierarchy, nodeIds, depths, currentIndex);
 
-                currentIndex++;
-                if (Objects.equals(siblingStack.peek(), currentIndex)) {
-                    siblingStack.poll();
-                }
+                currentIndex = moveToNextIndex(currentIndex, siblingStack);
             }
             else {
-                currentIndex = Optional.ofNullable(siblingStack.poll())
-                                       .orElse(hierarchy.size());
+                currentIndex = moveToNextSibling(hierarchy, siblingStack);
             }
         }
 
@@ -49,10 +42,28 @@ class Filter {
                                         depths.stream().mapToInt(Integer::intValue).toArray());
     }
 
-    static OptionalInt findNextSibling(Hierarchy hierarchy, int currentIndex, int lastIndex) {
+    private static int moveToNextSibling(Hierarchy hierarchy, Deque<Integer> siblingStack) {
+        return Optional.ofNullable(siblingStack.poll())
+                       .orElse(hierarchy.size());
+    }
+
+    private static int moveToNextIndex(int currentIndex, Deque<Integer> siblingStack) {
+        currentIndex++;
+        if (Objects.equals(siblingStack.peek(), currentIndex)) {
+            siblingStack.poll();
+        }
+        return currentIndex;
+    }
+
+    private static void addToResult(Hierarchy hierarchy, List<Integer> nodeIds, List<Integer> depths, int currentIndex) {
+        nodeIds.add(hierarchy.nodeId(currentIndex));
+        depths.add(hierarchy.depth(currentIndex));
+    }
+
+    private static OptionalInt findNextSibling(Hierarchy hierarchy, int currentIndex, int lastIndex) {
         return IntStream.range(currentIndex + 1, lastIndex)
-                .filter(index -> hierarchy.depth(index) == hierarchy.depth(currentIndex))
-                .findFirst();
+                        .filter(index -> hierarchy.depth(index) == hierarchy.depth(currentIndex))
+                        .findFirst();
     }
 }
 
